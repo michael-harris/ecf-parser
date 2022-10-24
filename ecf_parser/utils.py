@@ -125,10 +125,15 @@ def consume_ecf_line(line, entry=None) -> typing.Tuple['Entry', bool]:
     line_class = classify_line(line)
     if entry is not None:
         active_entry = entry if not hasattr(entry, "_active_child") else entry._active_child
-    if line_class == "PROPERTY_LINE":
-        prop = parse_property_line(line)
-        active_entry.add_property(prop)
-        return entry, False
+        if line_class == "PROPERTY_LINE":
+            prop = parse_property_line(line)
+            active_entry.add_property(prop)
+            return entry, False
+        if line_class == "ENTRY_END":
+            if active_entry is not entry:
+                delattr(entry, "_active_child")
+                return entry, False
+            return entry, True
     if line_class == "ENTRY_START":
         header_dict = parse_header_line(line)
         tmp_entry = ecf_parser.Entry(header_dict)
@@ -137,11 +142,6 @@ def consume_ecf_line(line, entry=None) -> typing.Tuple['Entry', bool]:
         entry.add_property(tmp_entry)
         entry._active_child = tmp_entry
         return entry, False
-    if line_class == "ENTRY_END":
-        if active_entry is not entry:
-            delattr(entry, "_active_child")
-            return entry, False
-        return entry, True
     return entry, False
 
 

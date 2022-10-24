@@ -94,9 +94,16 @@ def jsonl_file_to_ecf(file_path) -> typing.Generator[str, None, None]:
 
 def print_ecf2json():
     import sys
-
-    for line in ecf_file_to_json(sys.argv[1]):
-        print(line)
+    
+    ecf_filename = sys.argv[1]
+    ecf_fileprefix = ecf_filename.split('.')
+    print(ecf_fileprefix)
+    json_filename = 'test' + '.json'
+    
+    with open(json_filename, 'w') as json_file:
+        for line in ecf_file_to_json(sys.argv[1]):
+            json_file.write(line)
+            # print(line)
 
 
 def print_json2ecf():
